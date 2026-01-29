@@ -60,21 +60,30 @@ class MovieSession(models.Model):
 
 class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
-    user = models.ForeignKey(to=User, on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        to=User,
+        on_delete=models.CASCADE,
+        related_name="orders"
+    )
 
     class Meta:
         ordering = ["-created_at"]
 
     def __str__(self) -> str:
-        return f"<Order: {self.created_at}>"
+        return f'<Order: {self.created_at.strftime("%Y-%m-%d %H:%M:%S")}>'
 
 
 class Ticket(models.Model):
     movie_session = models.ForeignKey(
         to=MovieSession,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        related_name="tickets"
     )
-    order = models.ForeignKey(to=Order, on_delete=models.CASCADE)
+    order = models.ForeignKey(
+        to=Order,
+        on_delete=models.CASCADE,
+        related_name="tickets"
+    )
     row = models.IntegerField()
     seat = models.IntegerField()
 
@@ -98,7 +107,7 @@ class Ticket(models.Model):
             })
 
     def save(self, *args, **kwargs) -> None:
-        self.full_clean()  # To wywołuje metodę clean() powyżej
+        self.full_clean()
         return super().save(*args, **kwargs)
 
     class Meta:
